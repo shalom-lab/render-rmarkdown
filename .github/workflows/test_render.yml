@@ -5,19 +5,24 @@ jobs:
   render:
     runs-on: ubuntu-latest
     steps:
+      # Checkout the repository code
       - uses: actions/checkout@v2
       
-      # 预拉取基础镜像
+      # Pre-pull the Docker image to speed up the workflow
+      # This step is optional but recommended for faster execution
       - name: Pull base image
         run: docker pull slren/tidyverse-rmd
       
+      # Render the first R Markdown document (test_formats.Rmd)
+      # This will generate PDF, HTML, and Word documents
       - name: Render Documents
         id: render_docs
         uses: ./
         with:
           input_file: 'test/test_formats.Rmd'
       
-      # 列出生成的文件
+      # Debug step: List all files in the workspace
+      # This helps verify the output files are generated correctly
       - name: List output files
         run: |
           echo "Current directory:"
@@ -27,20 +32,18 @@ jobs:
           echo "Test directory contents:"
           ls -la test/
       
-      - name: Upload Documents
-        uses: actions/upload-artifact@v4
-        with:
-          name: rendered-documents
-          path: _output/
-      
+      # Render the second R Markdown document (test_dashboard.Rmd)
+      # This will generate a flexdashboard HTML file
       - name: Render Dashboard
         id: render_dash
         uses: ./
         with:
           input_file: 'test/test_dashboard.Rmd'
       
-      - name: Upload Dashboard
+      # Upload all rendered documents as a single artifact
+      # The _output/ directory contains all generated files from both render steps
+      - name: Upload Rendered Documents
         uses: actions/upload-artifact@v4
         with:
-          name: rendered-dashboard
+          name: rendered-documents
           path: _output/ 
