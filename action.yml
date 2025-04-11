@@ -1,8 +1,5 @@
 name: 'RMD Render Action'
 description: 'GitHub Action to render R Markdown documents using rocker/r-rmd'
-branding:
-  icon: 'book-open'
-  color: 'blue'
 
 inputs:
   input_file:
@@ -16,8 +13,6 @@ outputs:
 runs:
   using: 'docker'
   image: 'rocker/r-rmd'
-  env:
-    R_LIBS_USER: '/github/workspace/.cache/R'
   entrypoint: 'Rscript'
   args:
     - render.R
