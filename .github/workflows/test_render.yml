@@ -15,10 +15,10 @@ jobs:
     permissions:
       contents: write  # Required for pushing commits
     steps:
-      # Checkout the repository code
+      # Checkout the repository code with proper authentication
       - uses: actions/checkout@v2
         with:
-          persist-credentials: false
+          token: ${{ secrets.GITHUB_TOKEN }}
       
       # Pre-pull the Docker image to speed up the workflow
       # This step is optional but recommended for faster execution
@@ -76,7 +76,7 @@ jobs:
         run: |
           git add _output/
           git commit -m "Update rendered documents [skip ci]"
-          git push
+          git push origin HEAD:${{ github.ref }}
       
       # Optional: Upload rendered files as artifacts
       - name: Upload Rendered Documents
