@@ -12,6 +12,16 @@ A GitHub Action for rendering R Markdown documents in multiple formats (PDF, HTM
 - Uses `slren/tidyverse-rmd` Docker image with all dependencies pre-installed
 - Automatic package installation based on document requirements
 
+## Output Files
+
+The rendered files will be generated in the same directory as the input R Markdown file. For example:
+
+- Input: `docs/report.Rmd`
+- Output: 
+  - `docs/report.pdf`
+  - `docs/report.html`
+  - `docs/report.docx`
+
 ## Usage
 
 ```yaml
@@ -25,9 +35,17 @@ jobs:
       - uses: actions/checkout@v2
       
       - name: Render Documents
+        id: render_docs
         uses: ./
         with:
           input_file: 'path/to/your/document.Rmd'
+      
+      # Upload the rendered files as artifacts
+      - name: Upload Documents
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-documents
+          path: ${{ steps.render_docs.outputs.output_files }}
 ```
 
 ## Inputs
@@ -65,6 +83,14 @@ jobs:
         with:
           name: rendered-documents
           path: ${{ steps.render_docs.outputs.output_files }}
+```
+
+## Development
+
+To test locally:
+```bash
+docker pull slren/tidyverse-rmd
+docker run -v $(pwd):/workspace -w /workspace slren/tidyverse-rmd Rscript render.R test/test_formats.Rmd
 ```
 
 ## License

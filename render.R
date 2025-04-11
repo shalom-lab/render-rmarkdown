@@ -34,10 +34,26 @@ knitr::opts_chunk$set(
 
 # Render all formats defined in YAML
 tryCatch({
-  rmarkdown::render(
-    input = input_file,
-    output_format = "all"  # This will render all formats defined in YAML
-  )
+  if (needs_flexdashboard) {
+    # For flexdashboard, render directly
+    rmarkdown::render(
+      input = input_file,
+      output_format = "flexdashboard::flex_dashboard"
+    )
+  } else {
+    # For multiple formats, render each format separately
+    formats <- c("pdf_document", "html_document", "word_document")
+    for (format in formats) {
+      tryCatch({
+        rmarkdown::render(
+          input = input_file,
+          output_format = format
+        )
+      }, error = function(e) {
+        cat("\nWarning: Failed to render", format, ":", e$message, "\n")
+      })
+    }
+  }
 }, error = function(e) {
   cat("\nError during rendering:\n")
   cat(e$message, "\n")
