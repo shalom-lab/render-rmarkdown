@@ -2,10 +2,17 @@
 args <- commandArgs(trailingOnly = TRUE)
 input_file <- args[1]
 
+# Create output directory
+output_dir <- "_output"
+if (!dir.exists(output_dir)) {
+  dir.create(output_dir)
+}
+
 # Print debug info
 cat("Working directory:", getwd(), "\n")
 cat("Input file:", input_file, "\n")
 cat("File exists:", file.exists(input_file), "\n")
+cat("Output directory:", output_dir, "\n")
 
 # Set knitr options for figures
 knitr::opts_chunk$set(
@@ -18,7 +25,8 @@ knitr::opts_chunk$set(
 tryCatch({
   rmarkdown::render(
     input = input_file,
-    output_format = "all"  # This will render all formats defined in YAML
+    output_format = "all",  # This will render all formats defined in YAML
+    output_dir = output_dir
   )
 }, error = function(e) {
   cat("\nError during rendering:\n")
@@ -27,17 +35,16 @@ tryCatch({
 })
 
 # List generated files
-base_dir <- dirname(input_file)
 base_name <- tools::file_path_sans_ext(basename(input_file))
 output_files <- list.files(
-  path = base_dir,
+  path = output_dir,
   pattern = paste0("^", base_name, "\\.(pdf|html|docx)$"),
   full.names = TRUE
 )
 
 # Print debug info about output files
 cat("\nOutput directory contents:\n")
-cat(paste(list.files(base_dir), collapse = "\n"), "\n")
+cat(paste(list.files(output_dir), collapse = "\n"), "\n")
 cat("\nFound output files:\n")
 cat(paste(output_files, collapse = "\n"), "\n")
 
