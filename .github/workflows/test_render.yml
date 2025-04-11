@@ -16,7 +16,7 @@ jobs:
       
       # Upload the rendered dashboard as an artifact
       - name: Upload Dashboard
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: test-dashboard
           path: test/test_dashboard.html
