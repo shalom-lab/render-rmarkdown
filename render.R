@@ -18,7 +18,7 @@ cat("Output directory:", output_dir, "\n")
 knitr::opts_chunk$set(
   fig.width = 7,
   fig.height = 5,
-  fig.path = 'figures/'
+  fig.path = file.path(output_dir, 'figures/')
 )
 
 # Render document
@@ -34,17 +34,16 @@ tryCatch({
   quit(status = 1)
 })
 
-# List generated files
-base_name <- tools::file_path_sans_ext(basename(input_file))
+# List all generated files in the output directory
 output_files <- list.files(
   path = output_dir,
-  pattern = paste0("^", base_name, "\\.(pdf|html|docx)$"),
+  recursive = TRUE,
   full.names = TRUE
 )
 
 # Print debug info about output files
 cat("\nOutput directory contents:\n")
-cat(paste(list.files(output_dir), collapse = "\n"), "\n")
+cat(paste(list.files(output_dir, recursive = TRUE), collapse = "\n"), "\n")
 cat("\nFound output files:\n")
 cat(paste(output_files, collapse = "\n"), "\n")
 
