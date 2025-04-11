@@ -18,24 +18,7 @@ runs:
   image: 'rocker/r-rmd'
   env:
     R_LIBS_USER: '/github/workspace/.cache/R'
+  entrypoint: 'Rscript'
   args:
-    - -e
-    - |
-      # 安装依赖包
-      if (!requireNamespace("flexdashboard", quietly = TRUE)) {
-        install.packages("flexdashboard")
-      }
-      
-      # 渲染文档
-      rmarkdown::render("${{ inputs.input_file }}")
-      
-      # 列出生成的文件
-      base_dir <- dirname("${{ inputs.input_file }}")
-      base_name <- tools::file_path_sans_ext(basename("${{ inputs.input_file }}"))
-      output_files <- list.files(
-        path = base_dir,
-        pattern = paste0("^", base_name, "\\.(pdf|html|docx)$"),
-        full.names = TRUE
-      )
-      writeLines(sprintf("::set-output name=output_files::%s", 
-                        paste(output_files, collapse = ","))) 
+    - render.R
+    - ${{ inputs.input_file }} 
