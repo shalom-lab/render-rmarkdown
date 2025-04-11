@@ -2,28 +2,10 @@
 args <- commandArgs(trailingOnly = TRUE)
 input_file <- args[1]
 
-# Try to read YAML header safely
-needs_flexdashboard <- tryCatch({
-  # First check if we can read the file
-  if (!file.exists(input_file)) {
-    warning("Input file not found")
-    FALSE
-  } else {
-    # Read the first few lines to check for flexdashboard
-    lines <- readLines(input_file, n = 30)  # Read first 30 lines
-    yaml_text <- paste(lines, collapse = "\n")
-    any(grepl("flexdashboard", yaml_text, fixed = TRUE))
-  }
-}, error = function(e) {
-  warning("Error reading YAML header: ", e$message)
-  FALSE
-})
-
 # Print debug info
 cat("Working directory:", getwd(), "\n")
 cat("Input file:", input_file, "\n")
 cat("File exists:", file.exists(input_file), "\n")
-cat("Needs flexdashboard:", needs_flexdashboard, "\n")
 
 # Set knitr options for figures
 knitr::opts_chunk$set(
@@ -32,28 +14,12 @@ knitr::opts_chunk$set(
   fig.path = 'figures/'
 )
 
-# Render all formats defined in YAML
+# Render document
 tryCatch({
-  if (needs_flexdashboard) {
-    # For flexdashboard, render directly
-    rmarkdown::render(
-      input = input_file,
-      output_format = "flexdashboard::flex_dashboard"
-    )
-  } else {
-    # For multiple formats, render each format separately
-    formats <- c("pdf_document", "html_document", "word_document")
-    for (format in formats) {
-      tryCatch({
-        rmarkdown::render(
-          input = input_file,
-          output_format = format
-        )
-      }, error = function(e) {
-        cat("\nWarning: Failed to render", format, ":", e$message, "\n")
-      })
-    }
-  }
+  rmarkdown::render(
+    input = input_file,
+    output_format = "all"  # This will render all formats defined in YAML
+  )
 }, error = function(e) {
   cat("\nError during rendering:\n")
   cat(e$message, "\n")
