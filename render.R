@@ -1,14 +1,33 @@
-# Install required packages
-if (!requireNamespace("flexdashboard", quietly = TRUE)) {
-  install.packages("flexdashboard")
-}
-
 # Get command line arguments
 args <- commandArgs(trailingOnly = TRUE)
 input_file <- args[1]
 
-# Render the document
-rmarkdown::render(input_file)
+# Read and parse YAML header
+yaml_content <- rmarkdown::yaml_front_matter(input_file)
+
+# Check if flexdashboard is needed
+needs_flexdashboard <- any(
+  grepl("flexdashboard", 
+        sapply(yaml_content$output, function(x) if(is.character(x)) x else names(x)[1]))
+)
+
+# Install required packages only if needed
+if (needs_flexdashboard && !requireNamespace("flexdashboard", quietly = TRUE)) {
+  install.packages("flexdashboard")
+}
+
+# Set knitr options for figures
+knitr::opts_chunk$set(
+  fig.width = 7,
+  fig.height = 5,
+  fig.path = 'figures/'
+)
+
+# Render all formats defined in YAML
+rmarkdown::render(
+  input = input_file,
+  output_format = "all"  # This will render all formats defined in YAML
+)
 
 # List generated files
 base_dir <- dirname(input_file)

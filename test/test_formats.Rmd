@@ -4,14 +4,11 @@ author: "Test Author"
 date: "`r Sys.Date()`"
 output:
   pdf_document:
+    latex_engine: xelatex
     toc: true
     number_sections: true
-    latex_engine: xelatex
-    includes:
-      in_header: !expr system.file("header.tex", package = "rmarkdown")
-    extra_dependencies:
-      - xeCJK
-      - fontspec
+    fig_caption: true
+    keep_tex: true
   html_document:
     toc: true
     toc_float: true
@@ -22,7 +19,13 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(
+  echo = TRUE,
+  fig.width = 7,
+  fig.height = 5,
+  fig.path = 'figures/',
+  dev = 'pdf'
+)
 library(ggplot2)
 ```
 
@@ -70,7 +73,8 @@ ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
 
 ```{r basic_table}
 knitr::kable(head(mtcars[, 1:5]), 
-             caption = "First 6 rows of mtcars dataset")
+             caption = "First 6 rows of mtcars dataset",
+             booktabs = TRUE)
 ```
 
 ## Summary Statistics
@@ -80,7 +84,8 @@ summary_stats <- aggregate(mpg ~ cyl, data = mtcars,
                          FUN = function(x) c(mean = mean(x), 
                                            sd = sd(x)))
 knitr::kable(summary_stats,
-             caption = "MPG Statistics by Cylinder Count")
+             caption = "MPG Statistics by Cylinder Count",
+             booktabs = TRUE)
 ```
 
 # Math Equations
