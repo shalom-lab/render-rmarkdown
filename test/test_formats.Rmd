@@ -1,11 +1,17 @@
 ---
-title: "R Markdown 格式测试文档"
+title: "R Markdown Format Tests"
 author: "Test Author"
 date: "`r Sys.Date()`"
 output:
   pdf_document:
     toc: true
     number_sections: true
+    latex_engine: xelatex
+    includes:
+      in_header: !expr system.file("header.tex", package = "rmarkdown")
+    extra_dependencies:
+      - xeCJK
+      - fontspec
   html_document:
     toc: true
     toc_float: true
@@ -20,74 +26,74 @@ knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
 ```
 
-# 基础文本格式
+# Basic Text Formatting
 
-这是一个**粗体**文本，这是一个*斜体*文本。
+This is **bold** text, this is *italic* text.
 
-## 列表示例
+## List Example
 
-1. 第一项
-2. 第二项
-   - 子项 A
-   - 子项 B
-3. 第三项
+1. First item
+2. Second item
+   - Sub-item A
+   - Sub-item B
+3. Third item
 
-# 数据可视化
+# Data Visualization
 
-## 散点图
+## Scatter Plot
 
 ```{r scatter}
 ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
   geom_point(size = 3) +
-  labs(title = "汽车重量与油耗关系",
-       x = "重量 (1000 lbs)",
-       y = "油耗 (mpg)",
-       color = "气缸数") +
+  labs(title = "Car Weight vs MPG",
+       x = "Weight (1000 lbs)",
+       y = "Miles per Gallon",
+       color = "Cylinders") +
   theme_minimal()
 ```
 
-## 箱线图
+## Box Plot
 
 ```{r boxplot}
 ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
   geom_boxplot() +
-  labs(title = "不同气缸数的油耗分布",
-       x = "气缸数",
-       y = "油耗 (mpg)",
-       fill = "气缸数") +
+  labs(title = "MPG Distribution by Cylinders",
+       x = "Number of Cylinders",
+       y = "Miles per Gallon",
+       fill = "Cylinders") +
   theme_minimal()
 ```
 
-# 表格展示
+# Tables
 
-## 基础表格
+## Basic Table
 
 ```{r basic_table}
 knitr::kable(head(mtcars[, 1:5]), 
-             caption = "mtcars 数据集前 6 行")
+             caption = "First 6 rows of mtcars dataset")
 ```
 
-## 数据统计
+## Summary Statistics
 
 ```{r summary_table}
 summary_stats <- aggregate(mpg ~ cyl, data = mtcars, 
                          FUN = function(x) c(mean = mean(x), 
                                            sd = sd(x)))
 knitr::kable(summary_stats,
-             caption = "按气缸数分组的油耗统计")
+             caption = "MPG Statistics by Cylinder Count")
 ```
 
-# 数学公式
+# Math Equations
 
-行内公式：当 \(x \to \infty\)，\(e^{-x} \to 0\)
+Inline equation: When \(x \to \infty\), \(e^{-x} \to 0\)
 
-独立公式：
+Display equation:
 
 $$
 f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}
 $$
 
-# 代码展示
+# Code Example
 
 ```{r code_demo}
 fibonacci <- function(n) {
@@ -101,6 +107,6 @@ fibonacci <- function(n) {
   return(fib[n+1])
 }
 
-# 测试函数
+# Test the function
 sapply(0:5, fibonacci)
 ``` 
