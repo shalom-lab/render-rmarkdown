@@ -7,6 +7,32 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
+      # 设置 Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      # 配置 Docker 缓存
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ hashFiles('Dockerfile') }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      
+      # 预拉取基础镜像
+      - name: Pull base image
+        run: docker pull rocker/r-rmd:latest
+      
+      # 缓存 R 包
+      - name: Cache R packages
+        uses: actions/cache@v3
+        with:
+          path: .cache/R
+          key: ${{ runner.os }}-r-${{ hashFiles('**/DESCRIPTION') }}
+          restore-keys: |
+            ${{ runner.os }}-r-
+      
       - name: Render Documents
         id: render_docs
         uses: ./
