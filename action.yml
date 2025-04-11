@@ -14,28 +14,47 @@ outputs:
     description: 'Comma-separated list of rendered output files'
 
 runs:
-  using: 'docker'
-  image: 'rocker/r-rmd'
-  entrypoint: 'Rscript'
-  args:
-    - '-e'
-    - |
-      # Install required packages
-      if (!requireNamespace("flexdashboard", quietly = TRUE)) {
-        install.packages("flexdashboard")
-      }
-      
-      # Render the document using YAML configuration
-      rmarkdown::render(input = "${{ inputs.input_file }}")
-      
-      # List all generated files
-      base_dir <- dirname("${{ inputs.input_file }}")
-      base_name <- tools::file_path_sans_ext(basename("${{ inputs.input_file }}"))
-      output_files <- list.files(
-        path = base_dir,
-        pattern = paste0("^", base_name, "\\.(pdf|html|docx)$"),
-        full.names = TRUE
-      )
-      
-      # Write output files to GitHub Actions environment
-      writeLines(sprintf("::set-output name=output_files::%s", paste(output_files, collapse = ","))) 
+  using: 'composite'
+  steps:
+    # 1. 预拉取镜像
+    - name: Pull base image
+      shell: bash
+      run: docker pull rocker/r-rmd:latest
+
+    # 2. 安装依赖包
+    - name: Install R packages
+      shell: bash
+      run: |
+        docker run --rm \
+          -v ${{ github.workspace }}/.cache/R:/usr/local/lib/R/site-library \
+          rocker/r-rmd:latest \
+          Rscript -e '
+            if (!requireNamespace("flexdashboard", quietly = TRUE)) {
+              install.packages("flexdashboard")
+            }
+          '
+
+    # 3. 渲染文档
+    - name: Render document
+      shell: bash
+      run: |
+        docker run --rm \
+          -v ${{ github.workspace }}:/workspace \
+          -v ${{ github.workspace }}/.cache/R:/usr/local/lib/R/site-library \
+          -w /workspace \
+          rocker/r-rmd:latest \
+          Rscript -e '
+            # 渲染文档
+            rmarkdown::render("${{ inputs.input_file }}")
+            
+            # 列出生成的文件
+            base_dir <- dirname("${{ inputs.input_file }}")
+            base_name <- tools::file_path_sans_ext(basename("${{ inputs.input_file }}"))
+            output_files <- list.files(
+              path = base_dir,
+              pattern = paste0("^", base_name, "\\.(pdf|html|docx)$"),
+              full.names = TRUE
+            )
+            writeLines(sprintf("::set-output name=output_files::%s", 
+                             paste(output_files, collapse = ",")))
+          ' 
