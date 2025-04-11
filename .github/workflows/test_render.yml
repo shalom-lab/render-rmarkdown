@@ -29,7 +29,7 @@ jobs:
       # This will generate PDF, HTML, and Word documents
       - name: Render Documents
         id: render_docs
-        uses: ./
+        uses: ./ # use the action in the current repository / shalom-lab/render-rmarkdown@v1
         with:
           input_file: ${{ github.event.inputs.input_file || 'test/test_formats.Rmd' }}
 
