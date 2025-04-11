@@ -1,6 +1,6 @@
 ---
-title: "R Markdown Format Tests"
-author: "Test Author"
+title: "R Markdown 格式测试"
+author: "测试作者"
 date: "`r Sys.Date()`"
 output:
   pdf_document:
@@ -29,76 +29,76 @@ knitr::opts_chunk$set(
 library(ggplot2)
 ```
 
-# Basic Text Formatting
+# 基本文本格式
 
-This is **bold** text, this is *italic* text.
+这是**粗体**文本，这是*斜体*文本。
 
-## List Example
+## 列表示例
 
-1. First item
-2. Second item
-   - Sub-item A
-   - Sub-item B
-3. Third item
+1. 第一项
+2. 第二项
+   - 子项 A
+   - 子项 B
+3. 第三项
 
-# Data Visualization
+# 数据可视化
 
-## Scatter Plot
+## 散点图
 
 ```{r scatter}
 ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
   geom_point(size = 3) +
-  labs(title = "Car Weight vs MPG",
-       x = "Weight (1000 lbs)",
-       y = "Miles per Gallon",
-       color = "Cylinders") +
+  labs(title = "汽车重量与油耗关系",
+       x = "重量（1000磅）",
+       y = "每加仑英里数",
+       color = "气缸数") +
   theme_minimal()
 ```
 
-## Box Plot
+## 箱线图
 
 ```{r boxplot}
 ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
   geom_boxplot() +
-  labs(title = "MPG Distribution by Cylinders",
-       x = "Number of Cylinders",
-       y = "Miles per Gallon",
-       fill = "Cylinders") +
+  labs(title = "不同气缸数的油耗分布",
+       x = "气缸数",
+       y = "每加仑英里数",
+       fill = "气缸数") +
   theme_minimal()
 ```
 
-# Tables
+# 表格
 
-## Basic Table
+## 基本表格
 
 ```{r basic_table}
 knitr::kable(head(mtcars[, 1:5]), 
-             caption = "First 6 rows of mtcars dataset",
+             caption = "mtcars 数据集前6行",
              booktabs = TRUE)
 ```
 
-## Summary Statistics
+## 统计摘要
 
 ```{r summary_table}
 summary_stats <- aggregate(mpg ~ cyl, data = mtcars, 
                          FUN = function(x) c(mean = mean(x), 
                                            sd = sd(x)))
 knitr::kable(summary_stats,
-             caption = "MPG Statistics by Cylinder Count",
+             caption = "不同气缸数的油耗统计",
              booktabs = TRUE)
 ```
 
-# Math Equations
+# 数学公式
 
-Inline equation: When \(x \to \infty\), \(e^{-x} \to 0\)
+行内公式：当 \(x \to \infty\) 时，\(e^{-x} \to 0\)
 
-Display equation:
+显示公式：
 
 $$
 f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}
 $$
 
-# Code Example
+# 代码示例
 
 ```{r code_demo}
 fibonacci <- function(n) {
@@ -112,6 +112,6 @@ fibonacci <- function(n) {
   return(fib[n+1])
 }
 
-# Test the function
+# 测试函数
 sapply(0:5, fibonacci)
 ``` 

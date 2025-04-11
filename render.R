@@ -14,13 +14,6 @@ cat("Input file:", input_file, "\n")
 cat("File exists:", file.exists(input_file), "\n")
 cat("Output directory:", output_dir, "\n")
 
-# Set knitr options for figures
-knitr::opts_chunk$set(
-  fig.width = 7,
-  fig.height = 5,
-  fig.path = file.path(output_dir, 'figures/')
-)
-
 # Render document
 tryCatch({
   rmarkdown::render(
