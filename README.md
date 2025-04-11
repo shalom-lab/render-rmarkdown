@@ -30,6 +30,7 @@ jobs:
         with:
           input_file: 'path/to/your/document.Rmd'
       
+      # Optional: Upload as artifacts
       - name: Upload Documents
         uses: actions/upload-artifact@v4
         with:
@@ -60,6 +61,32 @@ All rendered files are saved in the `_output/` directory:
   - `_output/report.pdf`
   - `_output/report.html`
   - `_output/report.docx`
+
+### 💾 Committing to Repository
+
+You can optionally commit the rendered files to your repository:
+
+```yaml
+# Configure Git
+- name: Configure Git
+  run: |
+    git config --global user.name 'github-actions[bot]'
+    git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+# Commit specific files
+- name: Commit specific files
+  run: |
+    git add _output/report.pdf  # Only commit PDF
+    git commit -m "Update PDF report [skip ci]"
+    git push
+
+# Or commit all files
+- name: Commit all files
+  run: |
+    git add _output/
+    git commit -m "Update all rendered documents [skip ci]"
+    git push
+```
 
 ## 🛠️ Development
 

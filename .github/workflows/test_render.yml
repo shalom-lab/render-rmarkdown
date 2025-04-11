@@ -1,12 +1,24 @@
 name: Test R Markdown Formats
-on: [push]
+on: 
+  push:
+  workflow_dispatch:
+    inputs:
+      input_file:
+        description: 'Path to the R Markdown file to render'
+        required: true
+        default: 'test/test_formats.Rmd'
+        type: string
 
 jobs:
   render:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Required for pushing commits
     steps:
       # Checkout the repository code
       - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
       
       # Pre-pull the Docker image to speed up the workflow
       # This step is optional but recommended for faster execution
@@ -19,16 +31,18 @@ jobs:
         id: render_docs
         uses: ./
         with:
-          input_file: 'test/test_formats.Rmd'
+          input_file: ${{ github.event.inputs.input_file || 'test/test_formats.Rmd' }}
+
+      ## do your own thing here if you want with the rendered files(under _output directory)
       
-      # Print output files from first render
+      ## Some examples:
+      # Optional: Print output files for debugging
       - name: Print first render output
         run: |
           echo "Output files from first render:"
           echo "${{ steps.render_docs.outputs.output_files }}"
       
-      # Debug step: List all files in the workspace
-      # This helps verify the output files are generated correctly
+      # Optional: List files for debugging
       - name: List output files
         run: |
           echo "Current directory:"
@@ -38,22 +52,33 @@ jobs:
           echo "Test directory contents:"
           ls -la test/
       
-      # Render the second R Markdown document (test_dashboard.Rmd)
-      # This will generate a flexdashboard HTML file
+      # Optional: Render second document
       - name: Render Dashboard
         id: render_dash
         uses: ./
         with:
           input_file: 'test/test_dashboard.Rmd'
       
-      # Print output files from second render
+      # Optional: Print output files for debugging
       - name: Print second render output
         run: |
           echo "Output files from second render:"
           echo "${{ steps.render_dash.outputs.output_files }}"
       
-      # Upload all rendered documents as a single artifact
-      # The _output/ directory contains all generated files from both render steps
+      # Optional: Configure Git for committing files
+      - name: Configure Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+      
+      # Optional: Commit and push rendered files to repository
+      - name: Commit and push rendered files
+        run: |
+          git add _output/
+          git commit -m "Update rendered documents [skip ci]"
+          git push
+      
+      # Optional: Upload rendered files as artifacts
       - name: Upload Rendered Documents
         uses: actions/upload-artifact@v4
         with:
