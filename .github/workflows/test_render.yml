@@ -16,28 +16,29 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ hashFiles('Dockerfile') }}
+          key: ${{ runner.os }}-docker-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-buildx-
+            ${{ runner.os }}-docker-
       
       # 预拉取基础镜像
       - name: Pull base image
-        run: docker pull rocker/r-rmd:latest
-      
-      # 缓存 R 包
-      - name: Cache R packages
-        uses: actions/cache@v3
-        with:
-          path: .cache/R
-          key: ${{ runner.os }}-r-${{ hashFiles('**/DESCRIPTION') }}
-          restore-keys: |
-            ${{ runner.os }}-r-
+        run: docker pull slren/tidyverse-rmd
       
       - name: Render Documents
         id: render_docs
         uses: ./
         with:
           input_file: 'test/test_formats.Rmd'
+      
+      # 列出生成的文件
+      - name: List output files
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Directory contents:"
+          ls -la
+          echo "Test directory contents:"
+          ls -la test/
       
       - name: Upload Documents
         uses: actions/upload-artifact@v4

@@ -25,11 +25,6 @@ cat("Input file:", input_file, "\n")
 cat("File exists:", file.exists(input_file), "\n")
 cat("Needs flexdashboard:", needs_flexdashboard, "\n")
 
-# Install required packages only if needed
-if (needs_flexdashboard && !requireNamespace("flexdashboard", quietly = TRUE)) {
-  install.packages("flexdashboard")
-}
-
 # Set knitr options for figures
 knitr::opts_chunk$set(
   fig.width = 7,
@@ -38,10 +33,16 @@ knitr::opts_chunk$set(
 )
 
 # Render all formats defined in YAML
-rmarkdown::render(
-  input = input_file,
-  output_format = "all"  # This will render all formats defined in YAML
-)
+tryCatch({
+  rmarkdown::render(
+    input = input_file,
+    output_format = "all"  # This will render all formats defined in YAML
+  )
+}, error = function(e) {
+  cat("\nError during rendering:\n")
+  cat(e$message, "\n")
+  quit(status = 1)
+})
 
 # List generated files
 base_dir <- dirname(input_file)

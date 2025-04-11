@@ -1,19 +1,19 @@
-name: 'RMD Render Action'
-description: 'GitHub Action to render R Markdown documents using rocker/r-rmd'
+name: 'R Markdown Render Action'
+description: 'Renders R Markdown documents in multiple formats'
 
 inputs:
   input_file:
-    description: 'Path to the input R Markdown file'
+    description: 'Path to the R Markdown file to render'
     required: true
 
 outputs:
   output_files:
-    description: 'Comma-separated list of rendered output files'
+    description: 'Comma-separated list of generated output files'
 
 runs:
   using: 'docker'
-  image: 'rocker/r-rmd'
+  image: 'slren/tidyverse-rmd'
   entrypoint: 'Rscript'
   args:
-    - render.R
+    - 'render.R'
     - ${{ inputs.input_file }} 
