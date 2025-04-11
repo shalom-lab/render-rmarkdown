@@ -14,6 +14,8 @@ A GitHub Action for rendering R Markdown documents in multiple formats (PDF, HTM
 
 ## 🚀 Quick Start
 
+### Using the Action in Your Repository
+
 ```yaml
 name: Render R Markdown
 on: [push]
@@ -26,11 +28,42 @@ jobs:
       
       - name: Render Documents
         id: render_docs
-        uses: ./
+        uses: shalom-lab/render-rmarkdown@v1
         with:
           input_file: 'path/to/your/document.Rmd'
       
-      # Optional: Upload as artifacts
+      ## Process your subsequent logic with the rendered files(under _output directory)
+      - name: Upload Documents
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-documents
+          path: _output/
+```
+
+### Example Workflow
+
+Here's a complete example that renders an R Markdown file and publishes the output:
+
+```yaml
+name: Render and Publish R Markdown
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Render Documents
+        uses: shalom-lab/render-rmarkdown@v1
+        with:
+          input_file: 'docs/report.Rmd'
+      
       - name: Upload Documents
         uses: actions/upload-artifact@v4
         with:
@@ -61,32 +94,6 @@ All rendered files are saved in the `_output/` directory:
   - `_output/report.pdf`
   - `_output/report.html`
   - `_output/report.docx`
-
-### 💾 Committing to Repository
-
-You can optionally commit the rendered files to your repository:
-
-```yaml
-# Configure Git
-- name: Configure Git
-  run: |
-    git config --global user.name 'github-actions[bot]'
-    git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-
-# Commit specific files
-- name: Commit specific files
-  run: |
-    git add _output/report.pdf  # Only commit PDF
-    git commit -m "Update PDF report [skip ci]"
-    git push
-
-# Or commit all files
-- name: Commit all files
-  run: |
-    git add _output/
-    git commit -m "Update all rendered documents [skip ci]"
-    git push
-```
 
 ## 🛠️ Development
 
