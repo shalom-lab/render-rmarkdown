@@ -8,14 +8,10 @@ inputs:
   input_file:
     description: 'Path to the input R Markdown file'
     required: true
-  output_format:
-    description: 'Output format (pdf_document, word_document, html_document, or flexdashboard::flex_dashboard)'
-    required: false
-    default: 'pdf_document'
 
 outputs:
-  output_file:
-    description: 'Path to the rendered output file'
+  output_files:
+    description: 'Comma-separated list of rendered output files'
 
 runs:
   using: 'docker'
@@ -29,14 +25,17 @@ runs:
         install.packages("flexdashboard")
       }
       
-      input_file <- "${{ inputs.input_file }}"
-      output_format <- "${{ inputs.output_format }}"
+      # Render the document using YAML configuration
+      rmarkdown::render(input = "${{ inputs.input_file }}")
       
-      # Render the document
-      rmarkdown::render(
-        input = input_file,
-        output_format = output_format
+      # List all generated files
+      base_dir <- dirname("${{ inputs.input_file }}")
+      base_name <- tools::file_path_sans_ext(basename("${{ inputs.input_file }}"))
+      output_files <- list.files(
+        path = base_dir,
+        pattern = paste0("^", base_name, "\\.(pdf|html|docx)$"),
+        full.names = TRUE
       )
       
-      # Write the output file path to GitHub Actions environment
-      writeLines(sprintf("::set-output name=output_file::%s", tools::file_path_sans_ext(input_file))) 
+      # Write output files to GitHub Actions environment
+      writeLines(sprintf("::set-output name=output_files::%s", paste(output_files, collapse = ","))) 

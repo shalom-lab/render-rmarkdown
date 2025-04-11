@@ -1,0 +1,106 @@
+---
+title: "R Markdown 格式测试文档"
+author: "Test Author"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true
+    number_sections: true
+  html_document:
+    toc: true
+    toc_float: true
+    theme: united
+  word_document:
+    toc: true
+    reference_docx: null
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+# 基础文本格式
+
+这是一个**粗体**文本，这是一个*斜体*文本。
+
+## 列表示例
+
+1. 第一项
+2. 第二项
+   - 子项 A
+   - 子项 B
+3. 第三项
+
+# 数据可视化
+
+## 散点图
+
+```{r scatter}
+ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
+  geom_point(size = 3) +
+  labs(title = "汽车重量与油耗关系",
+       x = "重量 (1000 lbs)",
+       y = "油耗 (mpg)",
+       color = "气缸数") +
+  theme_minimal()
+```
+
+## 箱线图
+
+```{r boxplot}
+ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
+  geom_boxplot() +
+  labs(title = "不同气缸数的油耗分布",
+       x = "气缸数",
+       y = "油耗 (mpg)",
+       fill = "气缸数") +
+  theme_minimal()
+```
+
+# 表格展示
+
+## 基础表格
+
+```{r basic_table}
+knitr::kable(head(mtcars[, 1:5]), 
+             caption = "mtcars 数据集前 6 行")
+```
+
+## 数据统计
+
+```{r summary_table}
+summary_stats <- aggregate(mpg ~ cyl, data = mtcars, 
+                         FUN = function(x) c(mean = mean(x), 
+                                           sd = sd(x)))
+knitr::kable(summary_stats,
+             caption = "按气缸数分组的油耗统计")
+```
+
+# 数学公式
+
+行内公式：当 \(x \to \infty\)，\(e^{-x} \to 0\)
+
+独立公式：
+
+$$
+f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}
+$$
+
+# 代码展示
+
+```{r code_demo}
+fibonacci <- function(n) {
+  if (n <= 1) return(n)
+  fib <- numeric(n+1)
+  fib[1] <- 0
+  fib[2] <- 1
+  for (i in 3:(n+1)) {
+    fib[i] <- fib[i-1] + fib[i-2]
+  }
+  return(fib[n+1])
+}
+
+# 测试函数
+sapply(0:5, fibonacci)
+``` 

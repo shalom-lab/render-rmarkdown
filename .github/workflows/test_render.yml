@@ -1,4 +1,4 @@
-name: Test Dashboard Render
+name: Test R Markdown Formats
 on: [push]
 
 jobs:
@@ -7,15 +7,26 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
-      - name: Render Dashboard
+      - name: Render Documents
+        id: render_docs
         uses: ./
-        id: render
+        with:
+          input_file: 'test/test_formats.Rmd'
+      
+      - name: Upload Documents
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-documents
+          path: ${{ steps.render_docs.outputs.output_files }}
+      
+      - name: Render Dashboard
+        id: render_dash
+        uses: ./
         with:
           input_file: 'test/test_dashboard.Rmd'
-          output_format: 'flexdashboard::flex_dashboard'
       
       - name: Upload Dashboard
         uses: actions/upload-artifact@v4
         with:
-          name: test-dashboard
-          path: test/test_dashboard.html 
+          name: rendered-dashboard
+          path: ${{ steps.render_dash.outputs.output_files }} 
