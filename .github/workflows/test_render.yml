@@ -14,10 +14,8 @@ jobs:
           input_file: 'test/test_dashboard.Rmd'
           output_format: 'flexdashboard::flex_dashboard'
       
-      # Upload the rendered dashboard as an artifact
       - name: Upload Dashboard
         uses: actions/upload-artifact@v4
         with:
           name: test-dashboard
-          path: test/test_dashboard.html
-          retention-days: 5  # Keep the artifact for 5 days 
+          path: test/test_dashboard.html 
