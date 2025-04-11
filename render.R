@@ -2,14 +2,28 @@
 args <- commandArgs(trailingOnly = TRUE)
 input_file <- args[1]
 
-# Read and parse YAML header
-yaml_content <- rmarkdown::yaml_front_matter(input_file)
+# Try to read YAML header safely
+needs_flexdashboard <- tryCatch({
+  # First check if we can read the file
+  if (!file.exists(input_file)) {
+    warning("Input file not found")
+    FALSE
+  } else {
+    # Read the first few lines to check for flexdashboard
+    lines <- readLines(input_file, n = 30)  # Read first 30 lines
+    yaml_text <- paste(lines, collapse = "\n")
+    any(grepl("flexdashboard", yaml_text, fixed = TRUE))
+  }
+}, error = function(e) {
+  warning("Error reading YAML header: ", e$message)
+  FALSE
+})
 
-# Check if flexdashboard is needed
-needs_flexdashboard <- any(
-  grepl("flexdashboard", 
-        sapply(yaml_content$output, function(x) if(is.character(x)) x else names(x)[1]))
-)
+# Print debug info
+cat("Working directory:", getwd(), "\n")
+cat("Input file:", input_file, "\n")
+cat("File exists:", file.exists(input_file), "\n")
+cat("Needs flexdashboard:", needs_flexdashboard, "\n")
 
 # Install required packages only if needed
 if (needs_flexdashboard && !requireNamespace("flexdashboard", quietly = TRUE)) {
@@ -38,6 +52,22 @@ output_files <- list.files(
   full.names = TRUE
 )
 
-# Output results
-writeLines(sprintf("::set-output name=output_files::%s", 
-                  paste(output_files, collapse = ","))) 
+# Print debug info about output files
+cat("\nOutput directory contents:\n")
+cat(paste(list.files(base_dir), collapse = "\n"), "\n")
+cat("\nFound output files:\n")
+cat(paste(output_files, collapse = "\n"), "\n")
+
+# Get GITHUB_OUTPUT environment variable
+github_output <- Sys.getenv("GITHUB_OUTPUT")
+if (github_output != "") {
+  # Write to GITHUB_OUTPUT file
+  write(
+    sprintf("output_files=%s", paste(output_files, collapse = ",")),
+    file = github_output,
+    append = TRUE
+  )
+} else {
+  # Fallback for local testing
+  cat("output_files=", paste(output_files, collapse = ","), "\n")
+} 
