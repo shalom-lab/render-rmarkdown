@@ -1,0 +1,23 @@
+name: Test Dashboard Render
+on: [push]
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Render Dashboard
+        uses: ./
+        id: render
+        with:
+          input_file: 'test/test_dashboard.Rmd'
+          output_format: 'flexdashboard::flex_dashboard'
+      
+      # Upload the rendered dashboard as an artifact
+      - name: Upload Dashboard
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-dashboard
+          path: test/test_dashboard.html
+          retention-days: 5  # Keep the artifact for 5 days 

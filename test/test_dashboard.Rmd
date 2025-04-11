@@ -1,0 +1,53 @@
+---
+title: "Test Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(ggplot2)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  theme_minimal() +
+  labs(title = "Car Weight vs MPG",
+       x = "Weight (1000 lbs)",
+       y = "Miles per Gallon")
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+ggplot(mtcars, aes(x = hp, fill = factor(cyl))) +
+  geom_density(alpha = 0.5) +
+  theme_minimal() +
+  labs(title = "Horse Power Distribution by Cylinders",
+       x = "Horse Power",
+       y = "Density",
+       fill = "Cylinders")
+```
+
+### Chart C
+
+```{r}
+ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
+  geom_boxplot(fill = "lightblue") +
+  theme_minimal() +
+  labs(title = "MPG by Number of Cylinders",
+       x = "Number of Cylinders",
+       y = "Miles per Gallon")
+``` 

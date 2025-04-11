@@ -1,0 +1,57 @@
+name: 'RMD Render Action'
+description: 'GitHub Action to render R Markdown documents using rocker/r-rmd'
+branding:
+  icon: 'book-open'
+  color: 'blue'
+
+inputs:
+  input_file:
+    description: 'Path to the input R Markdown file'
+    required: true
+  output_format:
+    description: 'Output format (pdf_document, word_document, html_document, or flexdashboard::flex_dashboard)'
+    required: false
+    default: 'pdf_document'
+
+outputs:
+  output_file:
+    description: 'Path to the rendered output file'
+
+runs:
+  using: 'docker'
+  image: 'rocker/r-rmd'
+  entrypoint: 'Rscript'
+  args:
+    - '-e'
+    - |
+      # Install required packages
+      if (!requireNamespace("flexdashboard", quietly = TRUE)) {
+        install.packages("flexdashboard")
+      }
+      
+      input_file <- "${{ inputs.input_file }}"
+      output_format <- "${{ inputs.output_format }}"
+      
+      # Extract the base name without extension
+      base_name <- tools::file_path_sans_ext(input_file)
+      
+      # Determine output extension
+      ext <- switch(output_format,
+        "pdf_document" = ".pdf",
+        "word_document" = ".docx",
+        "html_document" = ".html",
+        "flexdashboard::flex_dashboard" = ".html"
+      )
+      
+      # Set output file path
+      output_file <- paste0(base_name, ext)
+      
+      # Render the document
+      rmarkdown::render(
+        input = input_file,
+        output_format = output_format,
+        output_file = output_file
+      )
+      
+      # Write the output file path to GitHub Actions environment
+      writeLines(sprintf("::set-output name=output_file::%s", output_file)) 
