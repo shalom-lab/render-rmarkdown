@@ -21,6 +21,12 @@ jobs:
         with:
           input_file: 'test/test_formats.Rmd'
       
+      # Print output files from first render
+      - name: Print first render output
+        run: |
+          echo "Output files from first render:"
+          echo "${{ steps.render_docs.outputs.output_files }}"
+      
       # Debug step: List all files in the workspace
       # This helps verify the output files are generated correctly
       - name: List output files
@@ -39,6 +45,12 @@ jobs:
         uses: ./
         with:
           input_file: 'test/test_dashboard.Rmd'
+      
+      # Print output files from second render
+      - name: Print second render output
+        run: |
+          echo "Output files from second render:"
+          echo "${{ steps.render_dash.outputs.output_files }}"
       
       # Upload all rendered documents as a single artifact
       # The _output/ directory contains all generated files from both render steps
